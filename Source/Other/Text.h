@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Other/Common-Things.h"
+#include "Common-Things.h"
 
 const string BRIGHTNESS_OPTIONS[] =
 {

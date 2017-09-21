@@ -12,9 +12,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
-using Kb = sf::Keyboard;
-using sf::RenderWindow;
-
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
@@ -35,6 +32,9 @@ using std::extent;
 using std::string;
 using std::to_string;
 using std::vector;
+
+using sf::RenderWindow;
+using Kb = sf::Keyboard;
 
 enum Button
 {

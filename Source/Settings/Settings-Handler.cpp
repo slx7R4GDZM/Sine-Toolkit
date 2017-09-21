@@ -27,7 +27,7 @@ Settings_Handler::Settings_Handler()
         parse_file_settings(in_file);
     else
     {
-        cerr << "Error reading file " << SETTINGS_FILENAME << ": " << strerror(errno) << '\n';
+        cerr << "Error reading file " << SETTINGS_FILENAME << ": " << std::strerror(errno) << '\n';
         std::ofstream out_file(SETTINGS_FILENAME);
 
         if (out_file.good())
@@ -36,7 +36,7 @@ Settings_Handler::Settings_Handler()
             out_file << DEFAULT_SETTINGS;
         }
         else
-            cerr << "Error writing file " << SETTINGS_FILENAME << ": " << strerror(errno) << '\n';
+            cerr << "Error writing file " << SETTINGS_FILENAME << ": " << std::strerror(errno) << '\n';
     }
 }
 

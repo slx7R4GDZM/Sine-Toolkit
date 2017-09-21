@@ -71,7 +71,7 @@ void set_position_and_size(const u8 cur_x, const u8 cur_y, const Global_Scale sc
     {
         static_cast<u16>(( LABS << 12) | (cur_y << 2)),
         static_cast<u16>((scale << 12) | (cur_x << 2)),
-        static_cast<u16>(( RTSL << 12))
+                         ( RTSL << 12)
     };
     vector_generator.process(vector_object, window);
 }
