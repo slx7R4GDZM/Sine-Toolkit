@@ -1,0 +1,12 @@
+add
+	configuration gui
+	support for non kb input
+	vector monitor shader
+	cmake file
+
+re-do correctly
+	a lot of the code, there's so much code duplication, this could probably be done in a few hundred less lines
+	vector generator
+	fix fps limiter being slightly off from 60
+	replace pragma onces with include guards and get rid of other non-standard stuff like case ranges
+	get rid of passing window and vectorgenerator to everything
