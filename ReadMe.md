@@ -32,6 +32,5 @@ Sine Toolkit was designed to compile with SFML 2.4.2 under MinGW-w64 7.1.0 POSIX
 
 ## License information
 
-This project is licensed under the terms of the [MIT License](License.txt).
-
+This project is licensed under the terms of the [MIT License](License.txt).\
 SFML is licensed under the terms of the [zlib/png license](https://www.sfml-dev.org/license.php).
