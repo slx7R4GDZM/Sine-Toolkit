@@ -54,31 +54,31 @@ void clear_instructions(vector<u16>& instructions)
 void calculate_VCTR(const Long_Vector lv, vector<u16>& instructions)
 {
     instructions[instructions.size() - 3] = (lv.opcode << 12)
-                                          + ((lv.delta_y < 0) << 10)
-                                          + std::abs(lv.delta_y);
+                                          | ((lv.delta_y < 0) << 10)
+                                          | std::abs(lv.delta_y);
     instructions[instructions.size() - 2] = (lv.brightness << 12)
-                                          + ((lv.delta_x < 0) << 10)
-                                          + std::abs(lv.delta_x);
+                                          | ((lv.delta_x < 0) << 10)
+                                          | std::abs(lv.delta_x);
 }
 
 void calculate_LABS(const Load_Absolute la, vector<u16>& instructions)
 {
     instructions[instructions.size() - 3] = (LABS << 12)
-                                          + ((la.y_position < 0) << 10)
-                                          + std::abs(la.y_position);
+                                          | ((la.y_position < 0) << 10)
+                                          | std::abs(la.y_position);
     instructions[instructions.size() - 2] = (la.global_scale << 12)
-                                          + ((la.x_position < 0) << 10)
-                                          + std::abs(la.x_position);
+                                          | ((la.x_position < 0) << 10)
+                                          | std::abs(la.x_position);
 }
 
 void calculate_SVEC(const Short_Vector sv, vector<u16>& instructions)
 {
     instructions[instructions.size() - 2] = (SVEC << 12)
-                                          + ((sv.local_scale & 1) << 11)
-                                          + ((sv.delta_y < 0) << 10)
-                                          + ((std::abs(sv.delta_y) & 3) << 8)
-                                          + (sv.brightness << 4)
-                                          + ((sv.local_scale & 2) << 2)
-                                          + ((sv.delta_x < 0) << 2)
-                                          + (std::abs(sv.delta_x) & 3);
+                                          | ((sv.local_scale & 1) << 11)
+                                          | ((sv.delta_y < 0) << 10)
+                                          | ((std::abs(sv.delta_y) & 3) << 8)
+                                          | (sv.brightness << 4)
+                                          | ((sv.local_scale & 2) << 2)
+                                          | ((sv.delta_x < 0) << 2)
+                                          | (std::abs(sv.delta_x) & 3);
 }
