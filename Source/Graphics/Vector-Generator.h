@@ -20,6 +20,8 @@ private:
     float crop_ratio;
     u8 gamma_table[16];
 
+    void crop_with_extra_space(const u32 axis_to_crop, float& crop_offset, const u32 scale_axis, float& scale_offset);
+
     void draw_long_vector(const Opcode opcode, const vector<u16> vector_object, u16& iteration, const bool flip_x, const bool flip_y, RenderWindow& window);
     void load_absolute(const vector<u16> vector_object, u16& iteration);
     void draw_short_vector(const vector<u16> vector_object, u16& iteration, const bool flip_x, const bool flip_y, const bool brighten, RenderWindow& window);
@@ -34,7 +36,7 @@ public:
     s16 current_y;
     Global_Scale global_scale;
 
-    Vector_Generator(const Settings_Handler settings_handler);
-    void set_resolution_scale(const sf::Vector2u resolution);
+    Vector_Generator(const Settings_Handler settings);
+    void set_resolution_scale(const Settings_Handler settings);
     void process(const vector<u16> vector_object, RenderWindow& window, u16 iteration = 0, const bool flip_x = false, const bool flip_y = false, const bool brighten = false);
 };

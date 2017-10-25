@@ -143,15 +143,15 @@ B-Toggle-Fullscreen F11
 # Window Settings
 #==============================================================================
 
-## Which window mode to use
+## Which mode to start the window with
 # 0 = Normal window (default)
 # 1 = Borderless window
 # 2 = Exclusive fullscreen
-Window-Mode 0
+Starting-Window-Mode 0
 
-## Window resolution
-X-Resolution 1024
-Y-Resolution 790
+## Starting window resolution
+Starting-X-Resolution 1024
+Starting-Y-Resolution 790
 
 ## Starting position for the program window
 # -1 = Don't set the starting position (default)
