@@ -8,106 +8,104 @@
 
 const string BRIGHTNESS_OPTIONS[] =
 {
-    "brightness 15",
-    "brightness 12",
-    "brightness 7",
-    "brightness 0"
+    "BRIGHTNESS 15",
+    "BRIGHTNESS 12",
+    "BRIGHTNESS 7",
+    "BRIGHTNESS 0"
 };
 
 const string GLOBAL_SCALE_OPTIONS[] =
 {
-    "global scale (*2)",
-    "global scale (*1)",
-    "global scale (/2)",
-    "global scale (/4)"
+    "GLOBAL SCALE (*2)",
+    "GLOBAL SCALE (*1)",
+    "GLOBAL SCALE (/2)",
+    "GLOBAL SCALE (/4)"
 };
 
 const string VCTR_OPTIONS[] =
 {
-    "local scale up",
-    "local scale down",
-    "local scale (/512)",
-    "local scale (*1)"
+    "LOCAL SCALE UP",
+    "LOCAL SCALE DOWN",
+    "LOCAL SCALE (/512)",
+    "LOCAL SCALE (*1)"
 };
 
 const string LABS_OPTIONS[] =
 {
-    "global scale up",
-    "global scale down",
-    "global scale (*1)",
-    "global scale (/2)"
+    "GLOBAL SCALE UP",
+    "GLOBAL SCALE DOWN",
+    "GLOBAL SCALE (*1)",
+    "GLOBAL SCALE (/2)"
 };
 
 const string SVEC_OPTIONS[] =
 {
-    "local scale up",
-    "local scale down",
-    "local scale (*2)",
-    "local scale (*16)"
+    "LOCAL SCALE UP",
+    "LOCAL SCALE DOWN",
+    "LOCAL SCALE (*2)",
+    "LOCAL SCALE (*16)"
 };
 
 const string SHIP_CREATOR_OPTIONS[] =
 {
-    "brightness up",
-    "brightness down",
-    "brightness 0",
-    "brightness 12"
+    "BRIGHTNESS UP",
+    "BRIGHTNESS DOWN",
+    "BRIGHTNESS 0",
+    "BRIGHTNESS 12"
 };
 
 /////////////////
 
-const string MAIN_MENU_CHOICES[] =
+const array<string, 5> MAIN_MENU_CHOICES =
 {
-    "edit vector object",
-    "edit text",
-    "edit ship",
-    "edit ship thrust",
-    "toggle vectors"
+    "EDIT VECTOR OBJECT",
+    "EDIT TEXT",
+    "EDIT SHIP",
+    "EDIT SHIP THRUST",
+    "TOGGLE VECTORS"
 };
 
-const string INSTRUCTION_MENU_CHOICES[] =
+const array<string, 3> INSTRUCTION_MENU_CHOICES =
 {
-    "draw long vector",
-    "load absolute",
-    "draw short vector"
+    "DRAW LONG VECTOR",
+    "LOAD ABSOLUTE",
+    "DRAW SHORT VECTOR"
 };
 
-const string VECTOR_OBJECT_MENU_CHOICES[] =
+const array<string, 5> VECTOR_OBJECT_MENU_CHOICES =
 {
-    "add instruction",
-    "remove instruction",
-    "set global scale",
-    "output vector object",
-    "clear vector object"
+    "ADD INSTRUCTION",
+    "REMOVE INSTRUCTION",
+    "SET GLOBAL SCALE",
+    "OUTPUT VECTOR OBJECT",
+    "CLEAR VECTOR OBJECT"
 };
 
-const string SHIP_MENU_CHOICES[] =
+const array<string, 4> SHIP_MENU_CHOICES =
 {
-    "add instruction",
-    "remove instruction",
-    "output ship",
-    "clear ship"
+    "ADD INSTRUCTION",
+    "REMOVE INSTRUCTION",
+    "OUTPUT SHIP",
+    "CLEAR SHIP"
 };
 
-const string THRUST_MENU_CHOICES[] =
+const array<string, 4> THRUST_MENU_CHOICES =
 {
-    "add instruction",
-    "remove instruction",
-    "output ship thrust",
-    "clear ship thrust"
+    "ADD INSTRUCTION",
+    "REMOVE INSTRUCTION",
+    "OUTPUT SHIP THRUST",
+    "CLEAR SHIP THRUST"
 };
 
-const string TOGGLE_VECTORS_MENU_CHOICES[] =
+const array<string, 3> TOGGLE_VECTORS_MENU_CHOICES =
 {
-    "box",
-    "vector object",
-    "ship and thrust"
+    "BOX",
+    "VECTOR OBJECT",
+    "SHIP AND THRUST"
 };
 
 const string DEFAULT_SETTINGS =
 R"(# Lines starting with # are ignored by the program
-# Do not add more than one space between a setting and the corresponding value
-# Do not add a space after a value
 
 #==============================================================================
 # List of Available Keys

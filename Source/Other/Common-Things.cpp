@@ -24,7 +24,7 @@ void add_blank_instructions(vector<u16>& instructions, const int amount_to_add)
 
 void remove_last_instruction(vector<u16>& instructions)
 {
-    for (unsigned int i = 0; i < instructions.size(); i++)
+    for (unsigned i = 0; i < instructions.size(); i++)
     {
         const u8 opcode = instructions[i] >> 12;
         if (opcode <= LABS)

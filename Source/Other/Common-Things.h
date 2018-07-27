@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <cstdint>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -25,10 +27,11 @@ using s16 = std::int_fast16_t;
 using s32 = std::int_fast32_t;
 using s64 = std::int_fast64_t;
 
-using std::cout;
+using std::array;
 using std::cerr;
 using std::clog;
 using std::extent;
+using std::printf;
 using std::string;
 using std::to_string;
 using std::vector;

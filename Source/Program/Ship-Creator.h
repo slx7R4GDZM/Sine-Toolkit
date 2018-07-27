@@ -9,10 +9,10 @@
 class Ship_Creator
 {
 private:
-    static void basic_vector_to_instructions(vector<u16>& instructions, const Basic_Vector rotated_vector);
-    static bool higher_SVEC(const Basic_Vector rotated_vector, Short_Vector& short_vector);
-    static Long_Vector lower_VCTR(const Basic_Vector rotated_vector);
+    static void add_basic_vector_to_VO(const Basic_Vector basic_vector, vector<u16>& vector_object);
+    static bool higher_SVEC(const Basic_Vector basic_vector, Short_Vector& converted_SVEC);
+    static Long_Vector lower_VCTR(const Basic_Vector basic_vector);
 public:
-    static void rotate_vector(const Basic_Vector vector_to_rotate, vector<u16> instructions[]);
-    static void output_lives_icon(const vector<u16> instructions);
+    static void rotate_vector(const Basic_Vector vector_to_rotate, vector<u16> vector_object_table[]);
+    static void output_lives_icon(const vector<u16> upward_ship_VO);
 };

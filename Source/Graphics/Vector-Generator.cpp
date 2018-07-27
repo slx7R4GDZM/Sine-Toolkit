@@ -53,7 +53,7 @@ void Vector_Generator::crop_with_extra_space(const u32 axis_to_crop, float& crop
     scale_offset = 0;
 }
 
-void Vector_Generator::process(const vector<u16> vector_object, RenderWindow& window, u16 iteration, const bool flip_x, const bool flip_y, const bool brighten)
+void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, u16 iteration, const bool flip_x, const bool flip_y, const bool brighten)
 {
     bool done = false;
     while (!done)
@@ -84,7 +84,7 @@ void Vector_Generator::process(const vector<u16> vector_object, RenderWindow& wi
 
 // instructions
 
-void Vector_Generator::draw_long_vector(const Opcode opcode, const vector<u16> vector_object, u16& iteration, const bool flip_x, const bool flip_y, RenderWindow& window)
+void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, RenderWindow& window)
 {
     s16 delta_y = vector_object[iteration] & 0x03FF;
     s16 delta_x = vector_object[iteration + 1] & 0x03FF;
@@ -102,7 +102,7 @@ void Vector_Generator::draw_long_vector(const Opcode opcode, const vector<u16> v
     draw_vector(delta_x, delta_y, brightness, flip_x, flip_y, window);
 }
 
-void Vector_Generator::load_absolute(const vector<u16> vector_object, u16& iteration)
+void Vector_Generator::load_absolute(const u16 vector_object[], u16& iteration)
 {
     current_y = vector_object[iteration] & 0x03FF;
     if (vector_object[iteration++] & 0x0400)
@@ -115,7 +115,7 @@ void Vector_Generator::load_absolute(const vector<u16> vector_object, u16& itera
     global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
-void Vector_Generator::draw_short_vector(const vector<u16> vector_object, u16& iteration, const bool flip_x, const bool flip_y, const bool brighten, RenderWindow& window)
+void Vector_Generator::draw_short_vector(const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, const bool brighten, RenderWindow& window)
 {
     s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
     s16 delta_y = vector_object[iteration] & 0x0300;

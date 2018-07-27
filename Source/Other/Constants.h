@@ -17,11 +17,11 @@ const string KEY_TABLE[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K
 const u8 TOTAL_BUTTONS = 9;
 const string BUTTON_TABLE[] = {"B-Confirm", "B-Cancel", "B-Up", "B-Down", "B-Left", "B-Right", "B-Options", "B-Toggle-Fullscreen", "B-Exit"};
 
-const u16 MAX_INSTRUCTIONS = 10000;
+const u16 MAX_VO_INSTRUCTIONS = 100;
 
 const float PI = std::atan(1) * 4;
 
 // ship creator
 const u8 DELTA_LENGTH = 8;
-const u8 DELTA_MAX = 128 / DELTA_LENGTH;
+const u8 DELTA_MAX = 256 / DELTA_LENGTH;
 const u8 ROTATIONS = 17;

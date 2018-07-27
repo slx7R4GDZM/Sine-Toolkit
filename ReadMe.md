@@ -4,9 +4,9 @@ Sine Toolkit was made to help with the development of [Sine](https://github.com/
 
 ## Screenshots
 
-| Vector object editor                                                                              | Text editor                                                                                    |
-|---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| ![Editing a vector object of the letter A](Media/Vector-object-editor.png "Vector object editor") | ![Editing the text \"your score is one of the ten best\"](Media/Text-editor.png "Text editor") |
+| Vector object editor                                                       | Text editor                                                                      |
+|----------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| ![Editing a vector object of the letter A](Media/Vector-object-editor.png) | ![Editing the text \"your score is one of the ten best\"](Media/Text-editor.png) |
 
 ## Download
 

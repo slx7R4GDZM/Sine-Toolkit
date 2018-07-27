@@ -88,8 +88,8 @@ private:
 
     Text_Editor text_editor;
 
-    Basic_Vector ship_vector;
-    Basic_Vector thrust_vector;
+    Basic_Vector ship_edit_vector;
+    Basic_Vector thrust_edit_vector;
     vector<u16> current_edit_table[ROTATIONS];
     vector<u16> ship_table[ROTATIONS];
     vector<u16> ship_thrust_table[ROTATIONS];
@@ -115,8 +115,9 @@ private:
     void set_starting_global_scale(Vector_Generator& vector_generator);
     bool modify_global_scale(Global_Scale& scale, Vector_Generator& vector_generator);
 
-    void rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u16> instructions[], Rotating_Vector_Menu& menu_choice, const string choices[], Vector_Generator& vector_generator);
-    void rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16> instructions[], Vector_Generator& vector_generator);
+    template <unsigned SIZE>
+    void rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u16> vector_object_table[], Rotating_Vector_Menu& menu_choice, const array<string, SIZE>& choices, Vector_Generator& vector_generator);
+    void rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16> vector_object_table[], Vector_Generator& vector_generator);
 
     void toggle_vectors_menu(Vector_Generator& vector_generator);
 
@@ -128,15 +129,15 @@ private:
     static string global_scale_text(const Global_Scale scale);
     s16 get_scaled_delta(const s16 delta) const;
     void draw_copyright(Vector_Generator& vector_generator);
-    template <typename T>
-    void process_menu(const string menu_text[], T& current_option, const u8 total_options, Vector_Generator& vector_generator);
+    template <unsigned SIZE, typename T>
+    void process_menu(const array<string, SIZE>& menu_text, T& current_option, Vector_Generator& vector_generator);
     void draw_option_button(Vector_Generator& vector_generator);
     void draw_vector_object(Vector_Generator& vector_generator);
     void draw_ship_edit_stuff(Vector_Generator& vector_generator);
 
     void output_vector_object() const;
-    void output_rotating_vector_offset(const vector<u16> instructions[]) const;
-    void output_rotating_vector(const vector<u16> instructions[]) const;
+    void output_rotating_VO_offsets(const vector<u16> vector_object_table[]) const;
+    void output_rotating_VO(const vector<u16> vector_object_table[]) const;
 public:
     Program();
 };

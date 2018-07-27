@@ -4,22 +4,21 @@
 
 #include "Ship-Creator.h"
 
-#include <cstdio>
 #include <cstdlib>
 #include "../Other/Constants.h"
 
-void Ship_Creator::rotate_vector(const Basic_Vector vector_to_rotate, vector<u16> instructions[])
+void Ship_Creator::rotate_vector(const Basic_Vector vector_to_rotate, vector<u16> vector_object_table[])
 {
     for (int i = 0; i < ROTATIONS; i++)
     {
-        clear_instructions(instructions[i]);
+        clear_instructions(vector_object_table[i]);
 
         const float angle_radians = (90.0f / (ROTATIONS - 1) * i) * PI / 180;
-        const float sin_angle = std::sin(angle_radians);
-        const float cos_angle = std::cos(angle_radians);
+        const float angle_sin = std::sin(angle_radians);
+        const float angle_cos = std::cos(angle_radians);
 
-        const float rotated_delta_x = cos_angle * vector_to_rotate.delta_x - sin_angle * vector_to_rotate.delta_y;
-        const float rotated_delta_y = sin_angle * vector_to_rotate.delta_x + cos_angle * vector_to_rotate.delta_y;
+        const float rotated_delta_x = vector_to_rotate.delta_x * angle_cos - vector_to_rotate.delta_y * angle_sin;
+        const float rotated_delta_y = vector_to_rotate.delta_y * angle_cos + vector_to_rotate.delta_x * angle_sin;
 
         const Basic_Vector rotated_vector =
         {
@@ -27,95 +26,103 @@ void Ship_Creator::rotate_vector(const Basic_Vector vector_to_rotate, vector<u16
             static_cast<s16>(std::round(rotated_delta_x * DELTA_LENGTH)),
             static_cast<s16>(std::round(rotated_delta_y * DELTA_LENGTH))
         };
-        basic_vector_to_instructions(instructions[i], rotated_vector);
+        add_basic_vector_to_VO(rotated_vector, vector_object_table[i]);
     }
 }
 
-void Ship_Creator::basic_vector_to_instructions(vector<u16>& instructions, const Basic_Vector rotated_vector)
+void Ship_Creator::add_basic_vector_to_VO(const Basic_Vector basic_vector, vector<u16>& vector_object)
 {
     Short_Vector short_vector;
-    const bool found_SVEC = higher_SVEC(rotated_vector, short_vector);
+    const bool vector_fits_SVEC = higher_SVEC(basic_vector, short_vector);
 
-    if (!found_SVEC)
+    if (!vector_fits_SVEC)
     {
-        add_blank_instructions(instructions, 2);
-        Long_Vector long_vector = lower_VCTR(rotated_vector);
-        calculate_VCTR(long_vector, instructions);
+        add_blank_instructions(vector_object, 2);
+        const Long_Vector long_vector = lower_VCTR(basic_vector);
+        calculate_VCTR(long_vector, vector_object);
     }
     else
     {
-        add_blank_instructions(instructions, 1);
-        calculate_SVEC(short_vector, instructions);
+        add_blank_instructions(vector_object, 1);
+        calculate_SVEC(short_vector, vector_object);
     }
 }
 
-// tries to convert rotated_vector to SVEC with highest local scale
-// without losing precision, returns false if not possible
-bool Ship_Creator::higher_SVEC(const Basic_Vector rotated_vector, Short_Vector& short_vector)
+// tries to convert basic vector to a short vector with highest local scale
+// without losing precision, returns false if it's not possible
+bool Ship_Creator::higher_SVEC(const Basic_Vector basic_vector, Short_Vector& converted_SVEC)
 {
-    for (s8 scale = 3; scale >= 0; scale--)
+    for (u8 scale = 3; scale < 4; scale--)
     {
         s8 delta_x;
         s8 delta_y;
-        bool found_x = false;
-        bool found_y = false;
-        for (int delta = 0; delta < 4; delta++)
+        bool x_fits_scale = false;
+        bool y_fits_scale = false;
+        for (u8 delta = 0; delta < 4; delta++)
         {
-            const u8 scaled_SVEC_delta = std::pow(2, scale + 1) * delta;
-            if (!found_x && std::abs(rotated_vector.delta_x) == scaled_SVEC_delta)
+            const u8 new_delta = std::pow(2, scale + 1) * delta;
+            if (!x_fits_scale && new_delta == std::abs(basic_vector.delta_x))
             {
-                found_x = true;
+                x_fits_scale = true;
                 delta_x = delta;
-                if (rotated_vector.delta_x < 0)
+                if (basic_vector.delta_x < 0)
                     delta_x = -delta_x;
             }
-            if (!found_y && std::abs(rotated_vector.delta_y) == scaled_SVEC_delta)
+            if (!y_fits_scale && new_delta == std::abs(basic_vector.delta_y))
             {
-                found_y = true;
+                y_fits_scale = true;
                 delta_y = delta;
-                if (rotated_vector.delta_y < 0)
+                if (basic_vector.delta_y < 0)
                     delta_y = -delta_y;
             }
         }
-        if (found_x && found_y)
+        if (x_fits_scale && y_fits_scale)
         {
-            short_vector = {static_cast<u8>(scale), rotated_vector.brightness, delta_x, delta_y};
+            converted_SVEC = {scale, basic_vector.brightness, delta_x, delta_y};
             return true;
         }
     }
     return false;
 }
 
-// converts rotated_vector to a VCTR with the lowest opcode without losing precision
-Long_Vector Ship_Creator::lower_VCTR(const Basic_Vector rotated_vector)
+// converts basic vector to a long vector with the
+// lowest opcode possible without losing precision
+Long_Vector Ship_Creator::lower_VCTR(const Basic_Vector basic_vector)
 {
-    Long_Vector lowered_VCTR = {VCTR_9, rotated_vector.brightness, rotated_vector.delta_x, rotated_vector.delta_y};
-    bool done = false;
-    for (int i = 1; i <= 9 && !done; i++)
+    Long_Vector converted_VCTR =
     {
-        const s16 new_delta_x = rotated_vector.delta_x * std::pow(2, i);
-        const s16 new_delta_y = rotated_vector.delta_y * std::pow(2, i);
-        if (new_delta_x <= -1024 || new_delta_x >= 1024 ||
-            new_delta_y <= -1024 || new_delta_y >= 1024)
-            done = true;
-        else
+        VCTR_9,
+        basic_vector.brightness,
+        basic_vector.delta_x,
+        basic_vector.delta_y
+    };
+
+    bool done = false;
+    for (u8 scale = VCTR_0; scale < VCTR_9 && !done; scale++)
+    {
+        const s16 scaled_delta_x = basic_vector.delta_x * std::pow(2, VCTR_9 - scale);
+        const s16 scaled_delta_y = basic_vector.delta_y * std::pow(2, VCTR_9 - scale);
+
+        if (scaled_delta_x > -1024 && scaled_delta_x < 1024
+         && scaled_delta_y > -1024 && scaled_delta_y < 1024)
         {
-            lowered_VCTR.opcode = VCTR_9 - i;
-            lowered_VCTR.delta_x = new_delta_x;
-            lowered_VCTR.delta_y = new_delta_y;
+            converted_VCTR = {scale, basic_vector.brightness, scaled_delta_x, scaled_delta_y};
+            done = true;
         }
     }
-    return lowered_VCTR;
+    return converted_VCTR;
 }
 
-void Ship_Creator::output_lives_icon(const vector<u16> instructions)
+void Ship_Creator::output_lives_icon(const vector<u16> upward_ship_VO)
 {
     s16 total_delta_x = 0;
     s16 total_delta_y = 0;
-    vector<u16> icon = instructions;
+    vector<u16> icon = upward_ship_VO;
 
-    // calculate the total delta and adjust icon brightness to 7
-    for (unsigned int i = 0; i < icon.size(); i++)
+    // add the delta from every vector in the vertical ship vector object
+    // to help figure out the spacing between the lives icon
+    // also adjust the max brightness of the icon to 7
+    for (unsigned i = 0; i < icon.size(); i++)
     {
         const u8 opcode = icon[i] >> 12;
         if (opcode <= VCTR_9)
@@ -161,19 +168,20 @@ void Ship_Creator::output_lives_icon(const vector<u16> instructions)
         }
     }
 
-    Basic_Vector lives_spacing = {
+    Basic_Vector lives_spacing =
+    {
         0,
         static_cast<s16>(-total_delta_x + 64),
         static_cast<s16>(-total_delta_y)
     };
-    basic_vector_to_instructions(icon, lives_spacing);
+    add_basic_vector_to_VO(lives_spacing, icon);
 
-    cout << "const u16 LIVES_REMAINING_SHIP[] = {";
-    for (unsigned int i = 0; i < icon.size(); i++)
+    printf("const u16 LIVES_REMAINING_SHIP[] = {");
+    for (unsigned i = 0; i < icon.size(); i++)
     {
-        std::printf("0x%04X", icon[i]);
-        if (i != icon.size() - 1)
-            cout << ", ";
+        printf("0x%04X", icon[i]);
+        if (i < icon.size() - 1)
+            printf(", ");
     }
-    cout << "};\n\n";
+    printf("};\n\n");
 }

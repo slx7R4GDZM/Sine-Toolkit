@@ -11,13 +11,13 @@
 void draw_string(const string message, const Global_Scale scale, const u8 x, const u8 y, Vector_Generator& vector_generator, RenderWindow& window, const bool brighten)
 {
     set_position_and_size(x, y, scale, vector_generator, window);
-    for (unsigned int i = 0; i < message.length(); i++)
+    for (unsigned i = 0; i < message.length(); i++)
     {
         const u8 character = message[i];
         switch (character)
         {
-        case 'a' ... 'z':
-            vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[character - 86], false, false, brighten);
+        case 'A' ... 'Z':
+            vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[character - 54], false, false, brighten);
             break;
         case '0' ... '9':
             vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[character - 47], false, false, brighten);
@@ -67,7 +67,7 @@ void draw_number(const int number, Vector_Generator& vector_generator, RenderWin
 
 void set_position_and_size(const u8 cur_x, const u8 cur_y, const Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window)
 {
-    const vector<u16> vector_object =
+    const u16 vector_object[] =
     {
         static_cast<u16>(( LABS << 12) | (cur_y << 2)),
         static_cast<u16>((scale << 12) | (cur_x << 2)),
@@ -94,21 +94,21 @@ void draw_rotating_vector(const vector<u16> vector_table[], const u8 fast_timer,
     if (fast_timer < 64)
     {
         const u8 rotation = fast_timer / 4;
-        vector_generator.process(vector_table[rotation], window);
+        vector_generator.process(vector_table[rotation].data(), window);
     }
     else if (fast_timer < 128)
     {
         const u8 rotation = 31 - (fast_timer - 1) / 4;
-        vector_generator.process(vector_table[rotation], window, 0, true);
+        vector_generator.process(vector_table[rotation].data(), window, 0, true);
     }
     else if (fast_timer < 192)
     {
         const u8 rotation = (fast_timer - 128) / 4;
-        vector_generator.process(vector_table[rotation], window, 0, true, true);
+        vector_generator.process(vector_table[rotation].data(), window, 0, true, true);
     }
     else
     {
         const u8 rotation = 63 - (fast_timer - 1) / 4;
-        vector_generator.process(vector_table[rotation], window, 0, false, true);
+        vector_generator.process(vector_table[rotation].data(), window, 0, false, true);
     }
 }

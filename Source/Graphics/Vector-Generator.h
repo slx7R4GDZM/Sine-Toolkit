@@ -22,9 +22,9 @@ private:
 
     void crop_with_extra_space(const u32 axis_to_crop, float& crop_offset, const u32 scale_axis, float& scale_offset);
 
-    void draw_long_vector(const Opcode opcode, const vector<u16> vector_object, u16& iteration, const bool flip_x, const bool flip_y, RenderWindow& window);
-    void load_absolute(const vector<u16> vector_object, u16& iteration);
-    void draw_short_vector(const vector<u16> vector_object, u16& iteration, const bool flip_x, const bool flip_y, const bool brighten, RenderWindow& window);
+    void draw_long_vector(const Opcode opcode, const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, RenderWindow& window);
+    void load_absolute(const u16 vector_object[], u16& iteration);
+    void draw_short_vector(const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, const bool brighten, RenderWindow& window);
 
     s16 apply_global_scale(const s16 delta) const;
 
@@ -38,5 +38,5 @@ public:
 
     Vector_Generator(const Settings_Handler settings);
     void set_resolution_scale(const Settings_Handler settings);
-    void process(const vector<u16> vector_object, RenderWindow& window, u16 iteration = 0, const bool flip_x = false, const bool flip_y = false, const bool brighten = false);
+    void process(const u16 vector_object[], RenderWindow& window, u16 iteration = 0, const bool flip_x = false, const bool flip_y = false, const bool brighten = false);
 };

@@ -4,7 +4,6 @@
 
 #include "Program.h"
 
-#include <cstdio>
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include "Ship-Creator.h"
@@ -28,8 +27,8 @@ Program::Program()
     , long_vector{VCTR_9, 7}
     , load_absolute{MUL_1, 512, 512}
     , short_vector{0, 7}
-    , ship_vector{12}
-    , thrust_vector{12}
+    , ship_edit_vector{12}
+    , thrust_edit_vector{12}
     , vector_toggle{1, 1, 2}
 {
     for (int i = 0; i < ROTATIONS; i++)
@@ -167,16 +166,16 @@ void Program::process_current_mode(Vector_Generator& vector_generator)
         text_editor.edit_text(mode, fast_timer, input, vector_generator, window);
         break;
     case SHIP_MENU:
-        rotating_vector_menu(ship_vector, ship_table, ship_menu_choice, SHIP_MENU_CHOICES, vector_generator);
+        rotating_vector_menu(ship_edit_vector, ship_table, ship_menu_choice, SHIP_MENU_CHOICES, vector_generator);
         break;
     case EDIT_SHIP:
-        rotating_vector_editor(ship_vector, ship_table, vector_generator);
+        rotating_vector_editor(ship_edit_vector, ship_table, vector_generator);
         break;
     case THRUST_MENU:
-        rotating_vector_menu(thrust_vector, ship_thrust_table, ship_thrust_menu_choice, THRUST_MENU_CHOICES, vector_generator);
+        rotating_vector_menu(thrust_edit_vector, ship_thrust_table, ship_thrust_menu_choice, THRUST_MENU_CHOICES, vector_generator);
         break;
     case EDIT_THRUST:
-        rotating_vector_editor(thrust_vector, ship_thrust_table, vector_generator);
+        rotating_vector_editor(thrust_edit_vector, ship_thrust_table, vector_generator);
         break;
     case TOGGLE_VECTORS_MENU:
         toggle_vectors_menu(vector_generator);
@@ -192,7 +191,7 @@ void Program::viewing_mode(Vector_Generator& vector_generator)
 
 void Program::main_menu(Vector_Generator& vector_generator)
 {
-    process_menu(MAIN_MENU_CHOICES, main_menu_choice, extent<decltype(MAIN_MENU_CHOICES)>::value, vector_generator);
+    process_menu(MAIN_MENU_CHOICES, main_menu_choice, vector_generator);
     if (input.on_press(CONFIRM))
     {
         switch (main_menu_choice)
@@ -220,7 +219,7 @@ void Program::main_menu(Vector_Generator& vector_generator)
 
 void Program::vector_object_menu(Vector_Generator& vector_generator)
 {
-    process_menu(VECTOR_OBJECT_MENU_CHOICES, vector_object_menu_choice, extent<decltype(VECTOR_OBJECT_MENU_CHOICES)>::value, vector_generator);
+    process_menu(VECTOR_OBJECT_MENU_CHOICES, vector_object_menu_choice, vector_generator);
     if (input.on_press(CONFIRM))
     {
         switch (vector_object_menu_choice)
@@ -248,13 +247,13 @@ void Program::vector_object_menu(Vector_Generator& vector_generator)
 
 void Program::instruction_menu(Vector_Generator& vector_generator)
 {
-    process_menu(INSTRUCTION_MENU_CHOICES, instruction_menu_choice, extent<decltype(INSTRUCTION_MENU_CHOICES)>::value, vector_generator);
+    process_menu(INSTRUCTION_MENU_CHOICES, instruction_menu_choice, vector_generator);
     if (input.on_press(CONFIRM))
     {
         switch (instruction_menu_choice)
         {
         case Instruction_Menu::DRAW_LONG_VECTOR:
-            if (vo_instructions.size() + 2 <= MAX_INSTRUCTIONS)
+            if (vo_instructions.size() + 2 <= MAX_VO_INSTRUCTIONS)
             {
                 mode = SET_BRIGHTNESS;
                 add_blank_instructions(vo_instructions, 2);
@@ -262,7 +261,7 @@ void Program::instruction_menu(Vector_Generator& vector_generator)
             }
             break;
         case Instruction_Menu::LOAD_ABSOLUTE:
-            if (vo_instructions.size() + 2 <= MAX_INSTRUCTIONS)
+            if (vo_instructions.size() + 2 <= MAX_VO_INSTRUCTIONS)
             {
                 mode = SET_GLOBAL_SCALE;
                 add_blank_instructions(vo_instructions, 2);
@@ -270,7 +269,7 @@ void Program::instruction_menu(Vector_Generator& vector_generator)
             }
             break;
         case Instruction_Menu::DRAW_SHORT_VECTOR:
-            if (vo_instructions.size() + 1 <= MAX_INSTRUCTIONS)
+            if (vo_instructions.size() + 1 <= MAX_VO_INSTRUCTIONS)
             {
                 mode = SET_BRIGHTNESS;
                 add_blank_instructions(vo_instructions, 1);
@@ -316,7 +315,7 @@ void Program::choose_brightness(u8& brightness, Vector_Generator& vector_generat
             brightness = (brightness > 0 ? sub_1(brightness, 0) : 15);
         }
     }
-    draw_string("brightness ", MUL_2, 99, 180, vector_generator, window);
+    draw_string("BRIGHTNESS ", MUL_2, 99, 180, vector_generator, window);
     draw_string(to_string(brightness), MUL_2, 99, 170, vector_generator, window);
 
     if (instruction_menu_choice == Instruction_Menu::DRAW_LONG_VECTOR)
@@ -349,7 +348,7 @@ void Program::set_global_scale(Vector_Generator& vector_generator)
 {
     const bool global_scale_changed = modify_global_scale(load_absolute.global_scale, vector_generator);
 
-    draw_string("global scale ", MUL_2, 93, 180, vector_generator, window);
+    draw_string("GLOBAL SCALE ", MUL_2, 93, 180, vector_generator, window);
     draw_string(global_scale_text(load_absolute.global_scale), MUL_2, 93, 170, vector_generator, window);
 
     if (global_scale_changed)
@@ -504,7 +503,7 @@ void Program::edit_SVEC(Vector_Generator& vector_generator)
 void Program::set_starting_global_scale(Vector_Generator& vector_generator)
 {
     modify_global_scale(start_global_scale, vector_generator);
-    draw_string("starting global scale ", MUL_2, 66, 180, vector_generator, window);
+    draw_string("STARTING GLOBAL SCALE ", MUL_2, 66, 180, vector_generator, window);
     draw_string(global_scale_text(start_global_scale), MUL_2, 66, 170, vector_generator, window);
     if (input.on_press(CONFIRM) || input.on_press(CANCEL))
         mode = VECTOR_OBJECT_MENU;
@@ -552,22 +551,23 @@ bool Program::modify_global_scale(Global_Scale& scale, Vector_Generator& vector_
     return global_scale_changed;
 }
 
-void Program::rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u16> instructions[], Rotating_Vector_Menu& menu_choice, const string choices[], Vector_Generator& vector_generator)
+template <unsigned SIZE>
+void Program::rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u16> vector_object_table[], Rotating_Vector_Menu& menu_choice, const array<string, SIZE>& choices, Vector_Generator& vector_generator)
 {
-    process_menu(choices, menu_choice, 4, vector_generator);
+    process_menu(choices, menu_choice, vector_generator);
     if (input.on_press(CONFIRM))
     {
         switch (menu_choice)
         {
         case Rotating_Vector_Menu::ADD_INSTRUCTION:
         {
-            unsigned int most_instructions = 0;
-            for (int i = 0; i < ROTATIONS; i++)
+            bool add_vector = true;
+            for (int i = 0; i < ROTATIONS && add_vector; i++)
             {
-                if (most_instructions < instructions[i].size())
-                    most_instructions = instructions[i].size();
+                if (vector_object_table[i].size() >= MAX_VO_INSTRUCTIONS)
+                    add_vector = false;
             }
-            if (most_instructions + 2 <= MAX_INSTRUCTIONS)
+            if (add_vector)
             {
                 Ship_Creator::rotate_vector(vector_to_rotate, current_edit_table);
                 if (mode == SHIP_MENU)
@@ -579,19 +579,19 @@ void Program::rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u
         }
         case Rotating_Vector_Menu::REMOVE_INSTRUCTION:
             for (int i = 0; i < ROTATIONS; i++)
-                remove_last_instruction(instructions[i]);
+                remove_last_instruction(vector_object_table[i]);
 
             break;
         case Rotating_Vector_Menu::OUTPUT_VECTOR_OBJECT:
-            output_rotating_vector_offset(instructions);
-            output_rotating_vector(instructions);
+            output_rotating_VO_offsets(vector_object_table);
+            output_rotating_VO(vector_object_table);
             if (main_menu_choice == Main_Menu::EDIT_SHIP)
                 Ship_Creator::output_lives_icon(ship_table[ROTATIONS - 1]);
 
             break;
         case Rotating_Vector_Menu::CLEAR_VECTOR_OBJECT:
             for (int i = 0; i < ROTATIONS; i++)
-                clear_instructions(instructions[i]);
+                clear_instructions(vector_object_table[i]);
 
             break;
         }
@@ -600,7 +600,7 @@ void Program::rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u
         mode = MAIN_MENU;
 }
 
-void Program::rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16> instructions[], Vector_Generator& vector_generator)
+void Program::rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16> vector_object_table[], Vector_Generator& vector_generator)
 {
     if (input.is_pressed(OPTIONS))
     {
@@ -638,17 +638,26 @@ void Program::rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16>
 
         if (input.on_press(CONFIRM))
         {
-            for (int i = 0; i < ROTATIONS; i++)
+            bool add_vector = true;
+            for (int i = 0; i < ROTATIONS && add_vector; i++)
             {
-                instructions[i].insert(instructions[i].end() - 1, current_edit_table[i].begin(), current_edit_table[i].end() - 1);
-                clear_instructions(current_edit_table[i]);
+                if (vector_object_table[i].size() + current_edit_table[i].size() - 1 > MAX_VO_INSTRUCTIONS)
+                    add_vector = false;
             }
-            vector_to_rotate.delta_x = 0;
-            vector_to_rotate.delta_y = 0;
-            if (mode == EDIT_SHIP)
-                mode = SHIP_MENU;
-            else
-                mode = THRUST_MENU;
+            if (add_vector)
+            {
+                for (int i = 0; i < ROTATIONS; i++)
+                {
+                    vector_object_table[i].insert(vector_object_table[i].end() - 1, current_edit_table[i].begin(), current_edit_table[i].end() - 1);
+                    clear_instructions(current_edit_table[i]);
+                }
+                vector_to_rotate.delta_x = 0;
+                vector_to_rotate.delta_y = 0;
+                if (mode == EDIT_SHIP)
+                    mode = SHIP_MENU;
+                else
+                    mode = THRUST_MENU;
+            }
         }
         else if (input.on_press(CANCEL))
         {
@@ -667,7 +676,7 @@ void Program::rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16>
 
 void Program::toggle_vectors_menu(Vector_Generator& vector_generator)
 {
-    process_menu(TOGGLE_VECTORS_MENU_CHOICES, toggle_vectors_menu_choice, extent<decltype(TOGGLE_VECTORS_MENU_CHOICES)>::value, vector_generator);
+    process_menu(TOGGLE_VECTORS_MENU_CHOICES, toggle_vectors_menu_choice, vector_generator);
 
     set_position_and_size(232, 218, MUL_2, vector_generator, window);
     draw_digit(vector_toggle.box, vector_generator, window);
@@ -702,56 +711,56 @@ string Program::get_mode_text() const
     switch (mode)
     {
     case VIEWING:
-        return "viewing";
+        return "VIEWING";
     case MAIN_MENU:
-        return "main menu";
+        return "MAIN MENU";
     case VECTOR_OBJECT_MENU:
-        return "vector object menu";
+        return "VECTOR OBJECT MENU";
     case INSTRUCTION_MENU:
-        return "instruction menu";
+        return "INSTRUCTION MENU";
     case SET_BRIGHTNESS:
-        return "set brightness";
+        return "SET BRIGHTNESS";
     case SET_GLOBAL_SCALE:
-        return "set global scale";
+        return "SET GLOBAL SCALE";
     case EDIT_VCTR:
-        return "editing vctr";
+        return "EDITING VCTR";
     case EDIT_LABS:
-        return "editing labs";
+        return "EDITING LABS";
     case EDIT_SVEC:
-        return "editing svec";
+        return "EDITING SVEC";
     case SET_STARTING_GLOBAL_SCALE:
-        return "set starting global scale";
+        return "SET STARTING GLOBAL SCALE";
     case EDIT_TEXT:
-        return "text editor";
+        return "TEXT EDITOR";
     case SHIP_MENU:
-        return "ship menu";
+        return "SHIP MENU";
     case EDIT_SHIP:
-        return "ship editor";
+        return "SHIP EDITOR";
     case THRUST_MENU:
-        return "thrust menu";
+        return "THRUST MENU";
     case EDIT_THRUST:
-        return "thrust editor";
+        return "THRUST EDITOR";
     case TOGGLE_VECTORS_MENU:
-        return "toggle vectors menu";
+        return "TOGGLE VECTORS MENU";
     default:
-        return "unknown mode";
+        return "UNKNOWN MODE";
     }
 }
 
 void Program::make_UI(Vector_Generator& vector_generator)
 {
     interface_text.clear();
-    interface_text.push_back("mode " + get_mode_text());
+    interface_text.push_back("MODE " + get_mode_text());
 
     if (mode >= VECTOR_OBJECT_MENU && mode <= SET_STARTING_GLOBAL_SCALE)
-        interface_text.push_back("instructions " + to_string(vo_instructions.size()));
+        interface_text.push_back("INSTRUCTIONS " + to_string(vo_instructions.size()));
     else if (mode == SHIP_MENU || mode == EDIT_SHIP)
     {
         u16 instructions = 0;
         for (int i = 0; i < ROTATIONS; i++)
             instructions += ship_table[i].size() + current_edit_table[i].size() - 1;
 
-        interface_text.push_back("instructions " + to_string(instructions));
+        interface_text.push_back("INSTRUCTIONS " + to_string(instructions));
     }
     else if (mode == THRUST_MENU || mode == EDIT_THRUST)
     {
@@ -759,17 +768,17 @@ void Program::make_UI(Vector_Generator& vector_generator)
         for (int i = 0; i < ROTATIONS; i++)
             instructions += ship_thrust_table[i].size() + current_edit_table[i].size() - 1;
 
-        interface_text.push_back("instructions " + to_string(instructions));
+        interface_text.push_back("INSTRUCTIONS " + to_string(instructions));
     }
 
     interface_text.push_back("");
 
     if (mode == VECTOR_OBJECT_MENU || mode == INSTRUCTION_MENU || mode == SET_STARTING_GLOBAL_SCALE)
     {
-        interface_text.push_back("global scale start " + global_scale_text(start_global_scale));
-        interface_text.push_back("global scale " + global_scale_text(global_scale));
-        interface_text.push_back("current x " + to_string(current_x));
-        interface_text.push_back("current y " + to_string(current_y));
+        interface_text.push_back("GLOBAL SCALE START " + global_scale_text(start_global_scale));
+        interface_text.push_back("GLOBAL SCALE " + global_scale_text(global_scale));
+        interface_text.push_back("CURRENT X " + to_string(current_x));
+        interface_text.push_back("CURRENT Y " + to_string(current_y));
     }
     else if (mode >= SET_BRIGHTNESS && mode <= EDIT_SVEC)
     {
@@ -780,69 +789,69 @@ void Program::make_UI(Vector_Generator& vector_generator)
 
         if (instruction_menu_choice == Instruction_Menu::DRAW_LONG_VECTOR)
         {
-            interface_text.push_back("opcode" + local_scale_text(long_vector.opcode));
-            interface_text.push_back("delta x " + to_string(long_vector.delta_x));
-            interface_text.push_back("delta y " + to_string(long_vector.delta_y));
-            interface_text.push_back("brightness " + to_string(long_vector.brightness));
+            interface_text.push_back("OPCODE" + local_scale_text(long_vector.opcode));
+            interface_text.push_back("DELTA X " + to_string(long_vector.delta_x));
+            interface_text.push_back("DELTA Y " + to_string(long_vector.delta_y));
+            interface_text.push_back("BRIGHTNESS " + to_string(long_vector.brightness));
 
             interface_text.push_back("");
 
-            interface_text.push_back("global scale start " + global_scale_text(start_global_scale));
-            interface_text.push_back("global scale " + global_scale_text(global_scale));
-            interface_text.push_back("current x " + to_string(current_x));
-            interface_text.push_back("current y " + to_string(current_y));
-            interface_text.push_back("scaled delta x " + to_string(get_scaled_delta(long_vector.delta_x)));
-            interface_text.push_back("scaled delta y " + to_string(get_scaled_delta(long_vector.delta_y)));
+            interface_text.push_back("GLOBAL SCALE START " + global_scale_text(start_global_scale));
+            interface_text.push_back("GLOBAL SCALE " + global_scale_text(global_scale));
+            interface_text.push_back("CURRENT X " + to_string(current_x));
+            interface_text.push_back("CURRENT Y " + to_string(current_y));
+            interface_text.push_back("SCALED DELTA X " + to_string(get_scaled_delta(long_vector.delta_x)));
+            interface_text.push_back("SCALED DELTA Y " + to_string(get_scaled_delta(long_vector.delta_y)));
         }
         else if (instruction_menu_choice == Instruction_Menu::LOAD_ABSOLUTE)
         {
-            interface_text.push_back("opcode 10");
-            interface_text.push_back("global scale " + to_string(load_absolute.global_scale));
-            interface_text.push_back("x position " + to_string(load_absolute.x_position));
-            interface_text.push_back("y position " + to_string(load_absolute.y_position));
+            interface_text.push_back("OPCODE 10");
+            interface_text.push_back("GLOBAL SCALE " + to_string(load_absolute.global_scale));
+            interface_text.push_back("X POSITION " + to_string(load_absolute.x_position));
+            interface_text.push_back("Y POSITION " + to_string(load_absolute.y_position));
 
             interface_text.push_back("");
 
-            interface_text.push_back("global scale start " + global_scale_text(start_global_scale));
-            interface_text.push_back("current x " + to_string(current_x));
-            interface_text.push_back("current y " + to_string(current_y));
+            interface_text.push_back("GLOBAL SCALE START " + global_scale_text(start_global_scale));
+            interface_text.push_back("CURRENT X " + to_string(current_x));
+            interface_text.push_back("CURRENT Y " + to_string(current_y));
         }
         else
         {
-            interface_text.push_back("opcode 15");
-            interface_text.push_back("local scale" + local_scale_text(short_vector.local_scale));
-            interface_text.push_back("delta x " + to_string(short_vector.delta_x));
-            interface_text.push_back("delta y " + to_string(short_vector.delta_y));
-            interface_text.push_back("brightness " + to_string(short_vector.brightness));
+            interface_text.push_back("OPCODE 15");
+            interface_text.push_back("LOCAL SCALE" + local_scale_text(short_vector.local_scale));
+            interface_text.push_back("DELTA X " + to_string(short_vector.delta_x));
+            interface_text.push_back("DELTA Y " + to_string(short_vector.delta_y));
+            interface_text.push_back("BRIGHTNESS " + to_string(short_vector.brightness));
 
             interface_text.push_back("");
 
-            interface_text.push_back("global scale start " + global_scale_text(start_global_scale));
-            interface_text.push_back("global scale " + global_scale_text(global_scale));
-            interface_text.push_back("current x " + to_string(current_x));
-            interface_text.push_back("current y " + to_string(current_y));
-            interface_text.push_back("scaled delta x " + to_string(get_scaled_delta(short_vector.delta_x)));
-            interface_text.push_back("scaled delta y " + to_string(get_scaled_delta(short_vector.delta_y)));
+            interface_text.push_back("GLOBAL SCALE START " + global_scale_text(start_global_scale));
+            interface_text.push_back("GLOBAL SCALE " + global_scale_text(global_scale));
+            interface_text.push_back("CURRENT X " + to_string(current_x));
+            interface_text.push_back("CURRENT Y " + to_string(current_y));
+            interface_text.push_back("SCALED DELTA X " + to_string(get_scaled_delta(short_vector.delta_x)));
+            interface_text.push_back("SCALED DELTA Y " + to_string(get_scaled_delta(short_vector.delta_y)));
         }
     }
     else if (mode == EDIT_SHIP)
     {
-        interface_text.push_back("delta x " + to_string(ship_vector.delta_x));
-        interface_text.push_back("delta y " + to_string(ship_vector.delta_y));
-        interface_text.push_back("brightness " + to_string(ship_vector.brightness));
+        interface_text.push_back("DELTA X " + to_string(ship_edit_vector.delta_x));
+        interface_text.push_back("DELTA Y " + to_string(ship_edit_vector.delta_y));
+        interface_text.push_back("BRIGHTNESS " + to_string(ship_edit_vector.brightness));
     }
     else if (mode == EDIT_THRUST)
     {
-        interface_text.push_back("delta x " + to_string(thrust_vector.delta_x));
-        interface_text.push_back("delta y " + to_string(thrust_vector.delta_y));
-        interface_text.push_back("brightness " + to_string(thrust_vector.brightness));
+        interface_text.push_back("DELTA X " + to_string(thrust_edit_vector.delta_x));
+        interface_text.push_back("DELTA Y " + to_string(thrust_edit_vector.delta_y));
+        interface_text.push_back("BRIGHTNESS " + to_string(thrust_edit_vector.brightness));
     }
 }
 
 void Program::draw_UI(Vector_Generator& vector_generator)
 {
     u8 y = 221;
-    for (unsigned int i = 0; i < interface_text.size(); i++)
+    for (unsigned i = 0; i < interface_text.size(); i++)
     {
         if (!interface_text[i].empty())
         {
@@ -929,28 +938,28 @@ void Program::draw_copyright(Vector_Generator& vector_generator)
     draw_character(23, vector_generator, window);
 }
 
-template <typename T>
-void Program::process_menu(const string menu_text[], T& current_option, const u8 total_options, Vector_Generator& vector_generator)
+template <unsigned SIZE, typename T>
+void Program::process_menu(const array<string, SIZE>& menu_text, T& current_option, Vector_Generator& vector_generator)
 {
     if (input.on_press(UP))
     {
         if (static_cast<u8>(current_option) == 0)
-            current_option = static_cast<T>(total_options - 1);
+            current_option = static_cast<T>(SIZE - 1);
         else
             current_option = static_cast<T>(sub_1(static_cast<u8>(current_option), 0));
     }
     else if (input.on_press(DOWN))
     {
-        if (static_cast<u8>(current_option) == total_options - 1)
+        if (static_cast<u8>(current_option) == SIZE - 1)
             current_option = static_cast<T>(0);
         else
-            current_option = static_cast<T>(add_1(static_cast<u8>(current_option), total_options - 1));
+            current_option = static_cast<T>(add_1(static_cast<u8>(current_option), SIZE - 1));
     }
 
     set_position_and_size(121, 229 - static_cast<u8>(current_option) * 10, MUL_1, vector_generator, window);
     vector_generator.process(ARROW, window, 18);
 
-    for (int i = 0; i < total_options; i++)
+    for (unsigned i = 0; i < SIZE; i++)
         draw_string(menu_text[i], MUL_2, 135, 218 - i * 10, vector_generator, window, i == static_cast<u8>(current_option));
 }
 
@@ -958,7 +967,7 @@ void Program::draw_option_button(Vector_Generator& vector_generator)
 {
     set_position_and_size(2, 47, MUL_1, vector_generator, window);
     vector_generator.process(BOX, window);
-    draw_string("optn", MUL_1, 4, 38, vector_generator, window);
+    draw_string("OPTN", MUL_1, 4, 38, vector_generator, window);
 }
 
 void Program::draw_vector_object(Vector_Generator& vector_generator)
@@ -973,7 +982,7 @@ void Program::draw_vector_object(Vector_Generator& vector_generator)
     // draw instructions
     if (vector_toggle.object || (mode >= VECTOR_OBJECT_MENU && mode <= SET_STARTING_GLOBAL_SCALE))
     {
-        vector_generator.process(vo_instructions, window);
+        vector_generator.process(vo_instructions.data(), window);
 
         // draw dot if needed
         switch (mode)
@@ -1046,20 +1055,20 @@ void Program::draw_ship_edit_stuff(Vector_Generator& vector_generator)
 
         // ship
         set_position_and_size(188, 128, DIV_2, vector_generator, window);
-        vector_generator.process(ship_table[0], window);
+        vector_generator.process(ship_table[0].data(), window);
         if (mode == SHIP_MENU || mode == EDIT_SHIP)
         {
-            vector_generator.process(current_edit_table[0], window);
-            if (!ship_vector.brightness)
+            vector_generator.process(current_edit_table[0].data(), window);
+            if (!ship_edit_vector.brightness)
                 vector_generator.process(DOT, window);
         }
 
         // thrust
-        vector_generator.process(ship_thrust_table[0], window);
+        vector_generator.process(ship_thrust_table[0].data(), window);
         if (mode == THRUST_MENU || mode == EDIT_THRUST)
         {
-            vector_generator.process(current_edit_table[0], window);
-            if (!thrust_vector.brightness)
+            vector_generator.process(current_edit_table[0].data(), window);
+            if (!thrust_edit_vector.brightness)
                 vector_generator.process(DOT, window);
         }
     }
@@ -1067,21 +1076,21 @@ void Program::draw_ship_edit_stuff(Vector_Generator& vector_generator)
 
 void Program::output_vector_object() const
 {
-    cout << "const u16 VECTOR_OBJECT[] = {";
-    for (unsigned int i = 0; i < vo_instructions.size(); i++)
+    printf("const u16 VECTOR_OBJECT[] = {");
+    for (unsigned i = 0; i < vo_instructions.size(); i++)
     {
-        std::printf("0x%04X", vo_instructions[i]);
-        if (i != vo_instructions.size() - 1)
-            cout << ", ";
+        printf("0x%04X", vo_instructions[i]);
+        if (i < vo_instructions.size() - 1)
+            printf(", ");
     }
-    cout << "};\n\n";
+    printf("};\n\n");
 }
 
-void Program::output_rotating_vector_offset(const vector<u16> instructions[]) const
+void Program::output_rotating_VO_offsets(const vector<u16> vector_object_table[]) const
 {
     int total_words = 0;
     for (int i = 0; i < ROTATIONS; i++)
-        total_words += instructions[i].size();
+        total_words += vector_object_table[i].size();
 
     u8 offset_nibbles = 0;
     bool done = false;
@@ -1094,49 +1103,49 @@ void Program::output_rotating_vector_offset(const vector<u16> instructions[]) co
     }
 
     if (offset_nibbles <= 2)
-        cout << "const u8 SHIP";
+        printf("const u8 SHIP");
     else if (offset_nibbles <= 4)
-        cout << "const u16 SHIP";
+        printf("const u16 SHIP");
     else
-        cout << "const u32 SHIP";
+        printf("const u32 SHIP");
 
     if (main_menu_choice == Main_Menu::EDIT_SHIP_THRUST)
-        cout << "_THRUST";
-    cout << "_OFFSET_TABLE[] = \n{\n";
+        printf("_THRUST");
+    printf("_OFFSET_TABLE[] = \n{\n");
 
     int total_offset = 0;
     for (int i = 0; i < ROTATIONS; i++)
     {
-        std::printf("    0x%0*X", offset_nibbles, total_offset);
-        if (i != ROTATIONS - 1)
-            cout << ',';
+        printf("    0x%0*X", offset_nibbles, total_offset);
+        if (i < ROTATIONS - 1)
+            printf(",");
 
-        cout << '\n';
-        total_offset += instructions[i].size();
+        printf("\n");
+        total_offset += vector_object_table[i].size();
     }
-    cout << "};\n\n";
+    printf("};\n\n");
 }
 
-void Program::output_rotating_vector(const vector<u16> instructions[]) const
+void Program::output_rotating_VO(const vector<u16> vector_object_table[]) const
 {
     if (main_menu_choice == Main_Menu::EDIT_SHIP)
-        cout << "const u16 SHIP_TABLE[] = \n{\n";
+        printf("const u16 SHIP_TABLE[] = \n{\n");
     else
-        cout << "const u16 SHIP_THRUST_TABLE[] = \n{\n";
+        printf("const u16 SHIP_THRUST_TABLE[] = \n{\n");
 
     for (int i = 0; i < ROTATIONS; i++)
     {
-        cout << "    ";
-        for (unsigned int x = 0; x < instructions[i].size(); x++)
+        printf("    ");
+        for (unsigned x = 0; x < vector_object_table[i].size(); x++)
         {
-            std::printf("0x%04X", instructions[i][x]);
-            if (x != instructions[i].size() - 1)
-                cout << ", ";
+            printf("0x%04X", vector_object_table[i][x]);
+            if (x < vector_object_table[i].size() - 1)
+                printf(", ");
         }
-        if (i != ROTATIONS - 1)
-            cout << ',';
+        if (i < ROTATIONS - 1)
+            printf(",");
 
-        cout << '\n';
+        printf("\n");
     }
-    cout << "};\n\n";
+    printf("};\n\n");
 }

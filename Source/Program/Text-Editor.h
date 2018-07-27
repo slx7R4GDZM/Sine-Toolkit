@@ -15,9 +15,9 @@ private:
     s8 key;
     string text;
 
-    static string get_last_n_chars(const string input, const int last_chars);
+    static string get_visible_string(const string& input);
     void output_packed_text() const;
-    u16 pack_message(const unsigned int msg_start, const bool final_message) const;
+    u16 pack_message(const unsigned msg_start, const bool final_message) const;
 public:
     Text_Editor();
     void edit_text(Mode& mode, const u8 fast_timer, const Input_Handler input, Vector_Generator& vector_generator, RenderWindow& window);
