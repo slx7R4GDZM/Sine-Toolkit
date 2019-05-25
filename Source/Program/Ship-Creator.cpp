@@ -7,18 +7,24 @@
 #include <cstdlib>
 #include "../Other/Constants.h"
 
-void Ship_Creator::rotate_vector(const Basic_Vector vector_to_rotate, vector<u16> vector_object_table[])
+static void add_basic_vector_to_VO(Basic_Vector basic_vector, vector<u16>& vector_object);
+static bool higher_SVEC(Basic_Vector basic_vector, Short_Vector& converted_SVEC);
+static Long_Vector lower_VCTR(Basic_Vector basic_vector);
+
+void Ship_Creator::rotate_vector(Basic_Vector vector_to_rotate, vector<u16> vector_object_table[])
 {
     for (int i = 0; i < ROTATIONS; i++)
     {
         clear_instructions(vector_object_table[i]);
 
-        const float angle_radians = (90.0f / (ROTATIONS - 1) * i) * PI / 180;
-        const float angle_sin = std::sin(angle_radians);
-        const float angle_cos = std::cos(angle_radians);
+        const float angle_radians = PI / 2 / (ROTATIONS - 1) * i;
+        const float height_ratio = std::sin(angle_radians);
+        const float length_ratio = std::cos(angle_radians);
 
-        const float rotated_delta_x = vector_to_rotate.delta_x * angle_cos - vector_to_rotate.delta_y * angle_sin;
-        const float rotated_delta_y = vector_to_rotate.delta_y * angle_cos + vector_to_rotate.delta_x * angle_sin;
+        const float rotated_delta_x = vector_to_rotate.delta_x * length_ratio
+                                    - vector_to_rotate.delta_y * height_ratio;
+        const float rotated_delta_y = vector_to_rotate.delta_y * length_ratio
+                                    + vector_to_rotate.delta_x * height_ratio;
 
         const Basic_Vector rotated_vector =
         {
@@ -30,7 +36,7 @@ void Ship_Creator::rotate_vector(const Basic_Vector vector_to_rotate, vector<u16
     }
 }
 
-void Ship_Creator::add_basic_vector_to_VO(const Basic_Vector basic_vector, vector<u16>& vector_object)
+void add_basic_vector_to_VO(Basic_Vector basic_vector, vector<u16>& vector_object)
 {
     Short_Vector short_vector;
     const bool vector_fits_SVEC = higher_SVEC(basic_vector, short_vector);
@@ -50,7 +56,7 @@ void Ship_Creator::add_basic_vector_to_VO(const Basic_Vector basic_vector, vecto
 
 // tries to convert basic vector to a short vector with highest local scale
 // without losing precision, returns false if it's not possible
-bool Ship_Creator::higher_SVEC(const Basic_Vector basic_vector, Short_Vector& converted_SVEC)
+bool higher_SVEC(Basic_Vector basic_vector, Short_Vector& converted_SVEC)
 {
     for (u8 scale = 3; scale < 4; scale--)
     {
@@ -87,7 +93,7 @@ bool Ship_Creator::higher_SVEC(const Basic_Vector basic_vector, Short_Vector& co
 
 // converts basic vector to a long vector with the
 // lowest opcode possible without losing precision
-Long_Vector Ship_Creator::lower_VCTR(const Basic_Vector basic_vector)
+Long_Vector lower_VCTR(Basic_Vector basic_vector)
 {
     Long_Vector converted_VCTR =
     {
@@ -113,7 +119,7 @@ Long_Vector Ship_Creator::lower_VCTR(const Basic_Vector basic_vector)
     return converted_VCTR;
 }
 
-void Ship_Creator::output_lives_icon(const vector<u16> upward_ship_VO)
+void Ship_Creator::output_lives_icon(const vector<u16>& upward_ship_VO)
 {
     s16 total_delta_x = 0;
     s16 total_delta_y = 0;

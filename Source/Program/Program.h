@@ -60,7 +60,51 @@ enum class Toggle_Vectors_Menu
 
 class Program
 {
+public:
+    Program();
 private:
+    void process_events(Vector_Generator& vector_generator, RenderWindow& window);
+    void limit_FPS(steady_clock::time_point start_time) const;
+
+    void process_current_mode(Vector_Generator& vector_generator);
+
+    void viewing_mode(Vector_Generator& vector_generator);
+
+    void main_menu(Vector_Generator& vector_generator);
+
+    void vector_object_menu(Vector_Generator& vector_generator);
+    void instruction_menu(Vector_Generator& vector_generator);
+    void choose_brightness(u8& brightness, Vector_Generator& vector_generator);
+    void set_global_scale(Vector_Generator& vector_generator);
+    void edit_VCTR(Vector_Generator& vector_generator);
+    void edit_LABS(Vector_Generator& vector_generator);
+    void edit_SVEC(Vector_Generator& vector_generator);
+    void set_starting_global_scale(Vector_Generator& vector_generator);
+    bool modify_global_scale(Global_Scale& scale, Vector_Generator& vector_generator);
+
+    template <unsigned SIZE>
+    void rotating_vector_menu(Basic_Vector vector_to_rotate, vector<u16> vector_object_table[], Rotating_Vector_Menu& menu_choice, const array<string, SIZE>& choices, Vector_Generator& vector_generator);
+    void rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16> vector_object_table[], Vector_Generator& vector_generator);
+
+    void toggle_vectors_menu(Vector_Generator& vector_generator);
+
+    string get_mode_text() const;
+    void make_UI(Vector_Generator& vector_generator);
+    void draw_UI(Vector_Generator& vector_generator);
+    void binary_instruction(u8 words, vector<string>& interface_text) const;
+    string local_scale_text(u8 local_scale) const;
+    s16 get_scaled_delta(s16 delta) const;
+    void draw_copyright(Vector_Generator& vector_generator);
+    template <unsigned SIZE, typename T>
+    void process_menu(const array<string, SIZE>& menu_text, T& current_option, Vector_Generator& vector_generator);
+    void draw_option_button(Vector_Generator& vector_generator);
+    void draw_vector_object(Vector_Generator& vector_generator);
+    void draw_ship_edit_stuff(Vector_Generator& vector_generator);
+
+    void output_vector_object() const;
+    void output_rotating_VO_offsets(const vector<u16> vector_object_table[]) const;
+    void output_rotating_VO(const vector<u16> vector_object_table[]) const;
+
     Settings_Handler settings;
     RenderWindow window;
     Input_Handler input;
@@ -95,49 +139,4 @@ private:
     vector<u16> ship_thrust_table[ROTATIONS];
 
     Vector_Toggle vector_toggle;
-
-    void process_events(Vector_Generator& vector_generator, RenderWindow& window);
-    void limit_FPS(const steady_clock::time_point start_time) const;
-
-    void process_current_mode(Vector_Generator& vector_generator);
-
-    void viewing_mode(Vector_Generator& vector_generator);
-
-    void main_menu(Vector_Generator& vector_generator);
-
-    void vector_object_menu(Vector_Generator& vector_generator);
-    void instruction_menu(Vector_Generator& vector_generator);
-    void choose_brightness(u8& brightness, Vector_Generator& vector_generator);
-    void set_global_scale(Vector_Generator& vector_generator);
-    void edit_VCTR(Vector_Generator& vector_generator);
-    void edit_LABS(Vector_Generator& vector_generator);
-    void edit_SVEC(Vector_Generator& vector_generator);
-    void set_starting_global_scale(Vector_Generator& vector_generator);
-    bool modify_global_scale(Global_Scale& scale, Vector_Generator& vector_generator);
-
-    template <unsigned SIZE>
-    void rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u16> vector_object_table[], Rotating_Vector_Menu& menu_choice, const array<string, SIZE>& choices, Vector_Generator& vector_generator);
-    void rotating_vector_editor(Basic_Vector& vector_to_rotate, vector<u16> vector_object_table[], Vector_Generator& vector_generator);
-
-    void toggle_vectors_menu(Vector_Generator& vector_generator);
-
-    string get_mode_text() const;
-    void make_UI(Vector_Generator& vector_generator);
-    void draw_UI(Vector_Generator& vector_generator);
-    void binary_instruction(const u8 words, vector<string>& interface_text) const;
-    string local_scale_text(const u8 local_scale) const;
-    static string global_scale_text(const Global_Scale scale);
-    s16 get_scaled_delta(const s16 delta) const;
-    void draw_copyright(Vector_Generator& vector_generator);
-    template <unsigned SIZE, typename T>
-    void process_menu(const array<string, SIZE>& menu_text, T& current_option, Vector_Generator& vector_generator);
-    void draw_option_button(Vector_Generator& vector_generator);
-    void draw_vector_object(Vector_Generator& vector_generator);
-    void draw_ship_edit_stuff(Vector_Generator& vector_generator);
-
-    void output_vector_object() const;
-    void output_rotating_VO_offsets(const vector<u16> vector_object_table[]) const;
-    void output_rotating_VO(const vector<u16> vector_object_table[]) const;
-public:
-    Program();
 };

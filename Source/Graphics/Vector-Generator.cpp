@@ -12,13 +12,13 @@ const float DESIRED_LINE_WIDTH = 0.75f;
 const float MINIMUM_LINE_WIDTH = 0.5f;
 const u16 INTERNAL_RES = 1024;
 
-Vector_Generator::Vector_Generator(const Settings_Handler settings)
+Vector_Generator::Vector_Generator(const Settings_Handler& settings)
 {
     settings.get_settings(crop_ratio, gamma_table);
     set_resolution_scale(settings);
 }
 
-void Vector_Generator::set_resolution_scale(const Settings_Handler settings)
+void Vector_Generator::set_resolution_scale(const Settings_Handler& settings)
 {
     this->resolution = settings.get_resolution();
     if (crop_ratio < 1.0f)
@@ -46,14 +46,14 @@ void Vector_Generator::set_resolution_scale(const Settings_Handler settings)
     line_thickness = DESIRED_LINE_WIDTH / res_scale;
 }
 
-void Vector_Generator::crop_with_extra_space(const u32 axis_to_crop, float& crop_offset, const u32 scale_axis, float& scale_offset)
+void Vector_Generator::crop_with_extra_space(u32 axis_to_crop, float& crop_offset, u32 scale_axis, float& scale_offset)
 {
     res_scale = static_cast<float>(INTERNAL_RES) / scale_axis;
     crop_offset = static_cast<s32>(axis_to_crop - scale_axis) * res_scale / 2;
     scale_offset = 0;
 }
 
-void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, u16 iteration, const bool flip_x, const bool flip_y, const bool brighten)
+void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, u16 iteration, bool flip_x, bool flip_y, bool brighten)
 {
     bool done = false;
     while (!done)
@@ -82,11 +82,11 @@ void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, 
     }
 }
 
-// instructions
+// opcodes
 
-void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, RenderWindow& window)
+void Vector_Generator::draw_long_vector(Opcode opcode, const u16 vector_object[], u16& iteration, bool flip_x, bool flip_y, RenderWindow& window)
 {
-    s16 delta_y = vector_object[iteration] & 0x03FF;
+    s16 delta_y = vector_object[iteration]     & 0x03FF;
     s16 delta_x = vector_object[iteration + 1] & 0x03FF;
 
     delta_y = apply_global_scale(delta_y >> (9 - opcode));
@@ -94,7 +94,7 @@ void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_ob
 
     if (vector_object[iteration++] & 0x0400)
         delta_y = -delta_y;
-    if (vector_object[iteration] & 0x0400)
+    if (vector_object[iteration]   & 0x0400)
         delta_x = -delta_x;
 
     const u8 brightness = vector_object[iteration] >> 12;
@@ -109,19 +109,19 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u16& iteration)
         current_y = -current_y;
 
     current_x = vector_object[iteration] & 0x03FF;
-    if (vector_object[iteration] & 0x0400)
+    if (vector_object[iteration]   & 0x0400)
         current_x = -current_x;
 
     global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
-void Vector_Generator::draw_short_vector(const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, const bool brighten, RenderWindow& window)
+void Vector_Generator::draw_short_vector(const u16 vector_object[], u16& iteration, bool flip_x, bool flip_y, bool brighten, RenderWindow& window)
 {
     s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
-    s16 delta_y = vector_object[iteration] & 0x0300;
+    s16 delta_y =  vector_object[iteration] & 0x0300;
 
-    const u8 local_scale = ((vector_object[iteration] & 0x0008) >> 2)
-                         | ((vector_object[iteration] & 0x0800) >> 11);
+    const u8 local_scale = (vector_object[iteration] & 0x0008) >>  2
+                         | (vector_object[iteration] & 0x0800) >> 11;
 
     delta_x = apply_global_scale(delta_x >> (7 - local_scale));
     delta_y = apply_global_scale(delta_y >> (7 - local_scale));
@@ -138,26 +138,26 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u16& iterati
     draw_vector(delta_x, delta_y, brightness, flip_x, flip_y, window);
 }
 
-s16 Vector_Generator::apply_global_scale(const s16 delta) const
+s16 Vector_Generator::apply_global_scale(s16 delta) const
 {
     if (global_scale <= MUL_128)
         return delta << global_scale;
-    else
-        return delta >> (16 - global_scale);
+
+    return delta >> (16 - global_scale);
 }
 
 // drawing stuff
 
-void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 brightness, const bool flip_x, const bool flip_y, RenderWindow& window)
+void Vector_Generator::draw_vector(s16 raw_delta_x, s16 raw_delta_y, u8 brightness, bool flip_x, bool flip_y, RenderWindow& window)
 {
-    const s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x);
-    const s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y);
+    const s16 delta_x = flip_x ? -raw_delta_x : raw_delta_x;
+    const s16 delta_y = flip_y ? -raw_delta_y : raw_delta_y;
     if (brightness)
     {
         const float adjusted_x = current_x + x_offset;
         const float adjusted_y = current_y + y_offset;
 
-        const float scaled_x_start = adjusted_x / res_scale;
+        const float scaled_x_start =                adjusted_x / res_scale;
         const float scaled_y_start = resolution.y - adjusted_y / res_scale;
         const sf::Color vector_color = sf::Color(255, 255, 255, gamma_table[brightness]);
         if (line_thickness >= MINIMUM_LINE_WIDTH)
@@ -169,7 +169,7 @@ void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y,
     current_y += delta_y;
 }
 
-void Vector_Generator::draw_wide_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, RenderWindow& window) const
+void Vector_Generator::draw_wide_line_segment(float start_x, float start_y, s16 delta_x, s16 delta_y, sf::Color vector_color, RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {
@@ -197,7 +197,7 @@ void Vector_Generator::draw_wide_line_segment(const float start_x, const float s
     }
 }
 
-void Vector_Generator::draw_thin_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, RenderWindow& window) const
+void Vector_Generator::draw_thin_line_segment(float start_x, float start_y, s16 delta_x, s16 delta_y, sf::Color vector_color, RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {

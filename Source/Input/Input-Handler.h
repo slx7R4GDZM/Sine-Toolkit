@@ -10,16 +10,17 @@ class Settings_Handler;
 
 class Input_Handler
 {
-private:
-    bool button_held[TOTAL_BUTTONS];
-    bool button_pushed[TOTAL_BUTTONS];
 public:
     Input_Handler() = default;
+
     void update(const Settings_Handler& settings_handler);
-    bool is_pressed(const Button button) const;
-    bool on_press(const Button button) const;
+    bool is_pressed(Button button) const;
+    bool on_press(Button button) const;
     void release_all_buttons();
     bool any_pressed() const;
     bool movement_is_pressed() const;
     bool movement_on_press() const;
+private:
+    bool button_held[TOTAL_BUTTONS];
+    bool button_pushed[TOTAL_BUTTONS];
 };

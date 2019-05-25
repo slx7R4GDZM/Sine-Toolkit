@@ -30,7 +30,6 @@ using s64 = std::int_fast64_t;
 using std::array;
 using std::cerr;
 using std::clog;
-using std::extent;
 using std::printf;
 using std::string;
 using std::to_string;
@@ -162,14 +161,14 @@ struct Basic_Vector
     s16 delta_y;
 };
 
-int add_1(const int base_val, const int max_val);
-int sub_1(const int base_val, const int min_val);
+int add_1(int base_val, int max_val);
+int sub_1(int base_val, int min_val);
 
-void add_blank_instructions(vector<u16>& instructions, const int amount_to_add);
+void add_blank_instructions(vector<u16>& instructions, int amount_to_add);
 void remove_last_instruction(vector<u16>& instructions);
-void remove_last_instructions(vector<u16>& instructions, const int amount_to_remove);
+void remove_last_instructions(vector<u16>& instructions, int amount_to_remove);
 void clear_instructions(vector<u16>& instructions);
 
-void calculate_VCTR(const Long_Vector lv, vector<u16>& instructions);
-void calculate_LABS(const Load_Absolute la, vector<u16>& instructions);
-void calculate_SVEC(const Short_Vector sv, vector<u16>& instructions);
+void calculate_VCTR(Long_Vector lv, vector<u16>& instructions);
+void calculate_LABS(Load_Absolute la, vector<u16>& instructions);
+void calculate_SVEC(Short_Vector sv, vector<u16>& instructions);

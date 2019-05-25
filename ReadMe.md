@@ -10,7 +10,7 @@ Sine Toolkit was made to help with the development of [Sine](https://github.com/
 
 ## Download
 
-The compressed source and a prebuilt Windows binary can be found [here](https://github.com/slx7R4GDZM/Sine-Toolkit/releases).
+A release for Windows can be found [here](https://github.com/slx7R4GDZM/Sine-Toolkit/releases).
 
 ## Default controls
 

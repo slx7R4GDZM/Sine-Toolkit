@@ -8,7 +8,7 @@
 #include "Vector-Generator.h"
 #include "../Other/Vectors.h"
 
-void draw_string(const string message, const Global_Scale scale, const u8 x, const u8 y, Vector_Generator& vector_generator, RenderWindow& window, const bool brighten)
+void draw_string(const string& message, Global_Scale scale, u8 x, u8 y, Vector_Generator& vector_generator, RenderWindow& window, bool brighten)
 {
     set_position_and_size(x, y, scale, vector_generator, window);
     for (unsigned i = 0; i < message.length(); i++)
@@ -43,35 +43,23 @@ void draw_string(const string message, const Global_Scale scale, const u8 x, con
     }
 }
 
-void draw_character(const u8 character, Vector_Generator& vector_generator, RenderWindow& window)
+void draw_character(u8 character, Vector_Generator& vector_generator, RenderWindow& window)
 {
     vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[character]);
 }
 
-void draw_digit(const u8 digit, Vector_Generator& vector_generator, RenderWindow& window)
+void draw_digit(u8 digit, Vector_Generator& vector_generator, RenderWindow& window)
 {
     vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1]);
 }
 
-void draw_number(const int number, Vector_Generator& vector_generator, RenderWindow& window)
-{
-    if (number < 0)
-        vector_generator.process(MINUS_SIGN, window);
-
-    const string num_string = to_string(std::abs(number));
-    const u8 digits = num_string.length();
-
-    for (int i = 0; i < digits; i++)
-        draw_digit(num_string[i] - '0', vector_generator, window);
-}
-
-void set_position_and_size(const u8 cur_x, const u8 cur_y, const Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window)
+void set_position_and_size(u8 cur_x, u8 cur_y, Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window)
 {
     const u16 vector_object[] =
     {
-        static_cast<u16>(( LABS << 12) | (cur_y << 2)),
-        static_cast<u16>((scale << 12) | (cur_x << 2)),
-                         ( RTSL << 12)
+        static_cast<u16>( LABS << 12 | cur_y << 2),
+        static_cast<u16>(scale << 12 | cur_x << 2),
+                          RTSL << 12
     };
     vector_generator.process(vector_object, window);
 }
@@ -89,7 +77,7 @@ void draw_options(const string options_text[], Vector_Generator& vector_generato
     }
 }
 
-void draw_rotating_vector(const vector<u16> vector_table[], const u8 fast_timer, Vector_Generator& vector_generator, RenderWindow& window)
+void draw_rotating_vector(const vector<u16> vector_table[], u8 fast_timer, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (fast_timer < 64)
     {

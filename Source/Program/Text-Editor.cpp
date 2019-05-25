@@ -14,11 +14,13 @@ const u8 MAX_TEXT_LENGTH = 100;
 const u8 CHARS_PER_MSG = 3;
 const u8 BITS_PER_CHAR = 5;
 
+static string get_visible_string(const string& input);
+
 Text_Editor::Text_Editor() : key(0)
 {
 }
 
-void Text_Editor::edit_text(Mode& mode, const u8 fast_timer, const Input_Handler input, Vector_Generator& vector_generator, RenderWindow& window)
+void Text_Editor::edit_text(Mode& mode, u8 fast_timer, const Input_Handler& input, Vector_Generator& vector_generator, RenderWindow& window)
 {
     for (int i = 0; i < 30; i++)
     {
@@ -108,7 +110,7 @@ void Text_Editor::edit_text(Mode& mode, const u8 fast_timer, const Input_Handler
         vector_generator.process(UNDERSCORE, window);
 }
 
-string Text_Editor::get_visible_string(const string& input)
+string get_visible_string(const string& input)
 {
     const int MAX_VISIBLE_CHARS = 41;
     const int first_visible_char = input.length() - MAX_VISIBLE_CHARS;
@@ -139,7 +141,7 @@ void Text_Editor::output_packed_text() const
     }
 }
 
-u16 Text_Editor::pack_message(const unsigned msg_start, const bool final_message) const
+u16 Text_Editor::pack_message(unsigned msg_start, bool final_message) const
 {
     u16 message = 0;
     bool null_terminated = false;

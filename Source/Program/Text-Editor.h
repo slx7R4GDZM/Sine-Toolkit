@@ -11,14 +11,14 @@ class Vector_Generator;
 
 class Text_Editor
 {
-private:
-    s8 key;
-    string text;
-
-    static string get_visible_string(const string& input);
-    void output_packed_text() const;
-    u16 pack_message(const unsigned msg_start, const bool final_message) const;
 public:
     Text_Editor();
-    void edit_text(Mode& mode, const u8 fast_timer, const Input_Handler input, Vector_Generator& vector_generator, RenderWindow& window);
+
+    void edit_text(Mode& mode, u8 fast_timer, const Input_Handler& input, Vector_Generator& vector_generator, RenderWindow& window);
+private:
+    void output_packed_text() const;
+    u16 pack_message(unsigned msg_start, bool final_message) const;
+
+    s8 key;
+    string text;
 };

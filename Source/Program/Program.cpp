@@ -12,6 +12,8 @@
 #include "../Other/Text.h"
 #include "../Other/Vectors.h"
 
+static string global_scale_text(Global_Scale scale);
+
 Program::Program()
     : game_activity(RUN_WITH_INPUT)
     , fast_timer(0)
@@ -113,16 +115,16 @@ void Program::process_events(Vector_Generator& vector_generator, RenderWindow& w
     }
 }
 
-void Program::limit_FPS(const steady_clock::time_point start_time) const
+void Program::limit_FPS(steady_clock::time_point start_time) const
 {
     if (settings.get_frame_limiter_mode() == SLEEPING)
     {
-        const nanoseconds frame_time = steady_clock::now() - start_time;
-        if (frame_time < MAX_FRAME_TIME)
-            std::this_thread::sleep_for(MAX_FRAME_TIME - frame_time);
+        const nanoseconds time_elapsed = steady_clock::now() - start_time;
+        if (time_elapsed < TARGET_FRAME_TIME)
+            std::this_thread::sleep_for(TARGET_FRAME_TIME - time_elapsed);
     }
     else
-        while (steady_clock::now() - start_time < MAX_FRAME_TIME);
+        while (steady_clock::now() - start_time < TARGET_FRAME_TIME);
 }
 
 void Program::process_current_mode(Vector_Generator& vector_generator)
@@ -552,7 +554,7 @@ bool Program::modify_global_scale(Global_Scale& scale, Vector_Generator& vector_
 }
 
 template <unsigned SIZE>
-void Program::rotating_vector_menu(const Basic_Vector vector_to_rotate, vector<u16> vector_object_table[], Rotating_Vector_Menu& menu_choice, const array<string, SIZE>& choices, Vector_Generator& vector_generator)
+void Program::rotating_vector_menu(Basic_Vector vector_to_rotate, vector<u16> vector_object_table[], Rotating_Vector_Menu& menu_choice, const array<string, SIZE>& choices, Vector_Generator& vector_generator)
 {
     process_menu(choices, menu_choice, vector_generator);
     if (input.on_press(CONFIRM))
@@ -864,7 +866,7 @@ void Program::draw_UI(Vector_Generator& vector_generator)
     draw_copyright(vector_generator);
 }
 
-void Program::binary_instruction(const u8 words, vector<string>& interface_text) const
+void Program::binary_instruction(u8 words, vector<string>& interface_text) const
 {
     for (int i = 0; i < words; i++)
     {
@@ -876,7 +878,7 @@ void Program::binary_instruction(const u8 words, vector<string>& interface_text)
     }
 }
 
-string Program::local_scale_text(const u8 local_scale) const
+string Program::local_scale_text(u8 local_scale) const
 {
     string local_scale_text = ' ' + to_string(local_scale) + '(';
     if (instruction_menu_choice == Instruction_Menu::DRAW_LONG_VECTOR)
@@ -887,7 +889,7 @@ string Program::local_scale_text(const u8 local_scale) const
     return local_scale_text + ')';
 }
 
-string Program::global_scale_text(const Global_Scale scale)
+string global_scale_text(Global_Scale scale)
 {
     string global_scale_text = to_string(scale) + '(';
     if (scale <= MUL_128)
@@ -898,7 +900,7 @@ string Program::global_scale_text(const Global_Scale scale)
     return global_scale_text + ')';
 }
 
-s16 Program::get_scaled_delta(const s16 delta) const
+s16 Program::get_scaled_delta(s16 delta) const
 {
     s16 scaled_delta = delta;
     if (instruction_menu_choice == Instruction_Menu::DRAW_LONG_VECTOR)
@@ -929,9 +931,9 @@ void Program::draw_copyright(Vector_Generator& vector_generator)
     draw_character(29, vector_generator, window);
     draw_character(22, vector_generator, window);
     draw_character(34, vector_generator, window);
-    draw_character(8, vector_generator, window);
+    draw_character( 8, vector_generator, window);
     draw_character(28, vector_generator, window);
-    draw_character(5, vector_generator, window);
+    draw_character( 5, vector_generator, window);
     draw_character(17, vector_generator, window);
     draw_character(14, vector_generator, window);
     draw_character(36, vector_generator, window);
